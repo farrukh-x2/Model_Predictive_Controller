@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
     cout << "OPTIONAL Usage ./mpc.exe N dt ref_v" << endl ;
     N = 6;
     dt = 0.095;
-    ref_v = 62.5;
+    ref_v = 62.25;
 
   }
 
