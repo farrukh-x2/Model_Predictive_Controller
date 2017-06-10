@@ -4,9 +4,10 @@ From Self-Driving Car Engineer Nanodegree Program, Starter Code Provided by Udac
 ![](MPC.gif)
 
 
-Overview
----
+#### Inputs to Executable file
 Passing N dt and ref_v values at runtime is optional. If no values are passed the best ones will be used.
+
+---
 
 ## Implementation
 #### The Model
@@ -21,7 +22,7 @@ The update equations of the model are given below (implemented in mpc.cpp):
       epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
 
 #### Timesteps and Duration
-For parameter tunning, I first started with dt equal to simulated latency of actuators (0.1). For large values of N (>15) the car would not track well. Reducing the N to within 6-8 produced better results. Then dt was tuned again. Increasing dt from 0.1 to 0.15 would make the car go off track near the first turn. Reducing the value too much made the car oscillate. Once the best value of dt was found N was adjusted again.
+For parameter tunning, I first started with dt equal to simulated latency of actuators (0.1). For large values of N (>15) the car would not track well. Reducing the N to within 6-8 produced better results. Then dt was tuned again. Increasing dt from 0.1 to 0.15 would make the car go off track near the first turn. Reducing the value too much made the car oscillate. Once the best value of dt was found, N was adjusted again.
 
 The above procedure was repeated for until a safe speed (ref_v) of 60 mph was attained. The car can drive with speeds up to 75 mph, but at  speeds greater than 60 mph the tire might occasionally pop up on the ledge. The speed in the gif file is 70 mph.
 
@@ -36,7 +37,7 @@ The waypoints are transformed from the map coordinates to the car coordinates sy
 A second degree polynomial is fitted to the trans waypoints. The coefficients of the which are used to generate the reference points. These reference points are shown by the yellow line in the gif.
 
 #### Latency
-First I tried to adjust for latency by predicting the state variable values 0.1 seconds in the future and passing those as input to the solver. This didn't result in a big improvement from my current model. The current model can deal with latency because it calculates multiple values into the time horizon and a 0.1 second doesn't create a significant impact.
+First I tried to adjust for latency by predicting the state variable values 0.1 seconds in the future and passing those as input to the solver. This didn't result in a big improvement from my current model. The current model can deal with latency because it calculates multiple values into the time horizon and a 0.1 second latency doesn't create a significant impact.
 
 
 ## Dependencies
