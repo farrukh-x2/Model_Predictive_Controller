@@ -45,7 +45,7 @@ class FG_eval {
     for (int t = 0; t < param.N; t++) {
       fg[0] += CppAD::pow(vars[param.cte_start + t], 2);
       fg[0] += CppAD::pow(vars[param.epsi_start + t], 2);
-      fg[0] += CppAD::pow((vars[param.v_start + t] - param.ref_v)*0.75, 2);
+      fg[0] += CppAD::pow((vars[param.v_start + t] - param.ref_v), 2);
       //cout<< v_start << " vars[v_start] " << vars[v_start+t] << endl;
     }
 

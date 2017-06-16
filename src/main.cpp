@@ -102,10 +102,11 @@ int main(int argc, char* argv[]) {
     cout << "OPTIONAL Usage ./mpc.exe N dt ref_v" << endl ;
     N = 6;
     dt = 0.095;
-    ref_v = 62.25;
+    ref_v = 65;
 
   }
 
+  ref_v *= 0.44704; // mph to m/s
 
   // MPC is initialized here!
   MPC mpc;
@@ -130,16 +131,17 @@ int main(int argc, char* argv[]) {
           double px = j[1]["x"];
           double py = j[1]["y"];
           double psi = j[1]["psi"];
-          double v = j[1]["speed"];
+          double v = j[1]["speed"] ;
+                 v *= 0.44704; // mph to m/s
           double str_ang = j[1]["steering_angle"];
 
 
           //Vector for storing transformed variables
-          Eigen::VectorXd transformed_xvals(ptsx.size());
-          Eigen::VectorXd transformed_yvals(ptsx.size());
+          Eigen::VectorXd transformed_xvals(6);
+          Eigen::VectorXd transformed_yvals(6);
 
           //Transform all way points
-          for (int i =0; i < ptsx.size(); i++){
+          for (int i =0; i < 6; i++){
 
             double temp_trans_x, temp_trans_y;
 
@@ -165,12 +167,24 @@ int main(int argc, char* argv[]) {
           }
 
 
-          // Calculate Erros
-          double cte =  -next_y_vals[0];
-          double epsi = -atan(coeffs[1]);
+          //Idea from Udacity Forums
+          double dt = 0.1;
+          // Put latency into initial state values
+          px = v*dt;
+          psi = -v*str_ang*dt/2.67;
 
-          Eigen::VectorXd state(6);
-          state << 0.0, 0.0,-1*str_ang, v, cte, epsi;
+          //double cte =  -next_y_vals[0]; // without latency
+          double cte = -polyeval(coeffs, px);
+
+          //double epsi = -atan(coeffs[1]); //without latency
+          double epsi = -atan(coeffs[1]+2*coeffs[2]*px);
+
+          // Initialize state vector
+          Eigen::VectorXd state(6); // {x, y, psi, v, cte, epsi}
+
+          //state << 0.0, 0.0,-1*str_ang, v, cte, epsi; //without latency
+          state << px, 0, psi, v, cte, epsi;
+
 
           vector<double> output = mpc.Solve(state, coeffs);
          
@@ -189,7 +203,7 @@ int main(int argc, char* argv[]) {
           vector<double> mpc_y_vals;
 
           //Ignore the last coordinates of predicted trajectory as a new one is calculated before those are reached
-          for (int i = 2; i < output.size()-4; i+=2 ) {
+          for (int i = 2; i < output.size()-3; i+=2 ) {
                      mpc_x_vals.push_back(output[i]);
                      mpc_y_vals.push_back(output[i+1]);
           }
