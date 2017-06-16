@@ -101,13 +101,13 @@ int main(int argc, char* argv[]) {
 
     cout << "OPTIONAL Usage ./mpc.exe N dt ref_v" << endl ;
     N = 6;
-    dt = 0.095;
+    dt = 0.135;
     ref_v = 65;
 
   }
 
   ref_v *= 0.44704; // mph to m/s
-
+  cout<< "N " << N << " dt " << dt << " ref_v " <<ref_v << endl;
   // MPC is initialized here!
   MPC mpc;
   mpc.init(N, dt, ref_v) ;
