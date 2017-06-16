@@ -24,7 +24,7 @@ The update equations of the model are given below (implemented in mpc.cpp):
 #### Timesteps and Duration
 For parameter tunning, I first started with dt equal to simulated latency of actuators (0.1). For large values of N (>15) the car would not track well. Reducing the N to within 6-8 produced better results. Then dt was tuned again. Increasing dt from 0.1 to 0.15 would make the car go off track near the first turn. Reducing the value too much made the car oscillate. Once the best value of dt was found, N was adjusted again.
 
-The above procedure was repeated for until a safe speed (ref_v) of 60 mph was attained. The car can drive with speeds up to 75 mph, but at  speeds greater than 60 mph the tire might occasionally pop up on the ledge. The speed in the gif file is 70 mph.
+The above procedure was repeated for until a safe speed (ref_v) of ~65 mph was attained. The car can drive with speeds up to 75 mph, but at  speeds greater than 60 mph the tire might occasionally pop up on the ledge. The speed in the gif file is 63 mph.
 
 #### Preprocessing and Polynomial Fitting
 The waypoints are transformed from the map coordinates to the car coordinates system. This transformation is implemented as below:
@@ -37,7 +37,23 @@ The waypoints are transformed from the map coordinates to the car coordinates sy
 A second degree polynomial is fitted to the trans waypoints. The coefficients of the which are used to generate the reference points. These reference points are shown by the yellow line in the gif.
 
 #### Latency
-First I tried to adjust for latency by predicting the state variable values 0.1 seconds in the future and passing those as input to the solver. This didn't result in a big improvement from my current model. The current model can deal with latency because it calculates multiple values into the time horizon and a 0.1 second latency doesn't create a significant impact.
+Latency is adjusted for by predicting the state variable values 0.1 seconds in the future and passing those as input to the solver. The equations are reflected below:
+
+          //Idea from Udacity Forums
+          double dt = 0.1;
+          // Put latency into initial state values
+          px = v*dt;
+          psi = -v*str_ang*dt/2.67;
+
+          //double cte =  -next_y_vals[0]; // without latency
+          double cte = -polyeval(coeffs, px);
+
+          //double epsi = -atan(coeffs[1]); //without latency
+          double epsi = -atan(coeffs[1]+2*coeffs[2]*px);
+
+          //state << 0.0, 0.0,-1*str_ang, v, cte, epsi; //without latency
+          state << px, 0, psi, v, cte, epsi;
+
 
 
 ## Dependencies
